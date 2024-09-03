@@ -1,0 +1,32 @@
+on right click with a flower banner pattern:
+    if name of player's tool contains "§" and "귀환서":
+        remove 1 of player's tool from player's inventory
+        send title "" with subtitle "&6귀환합니다..." to player for 4 second
+        wait 4 seconds
+        teleport player to location(-253, 65, 505, world "world")
+        send title "" with subtitle "&a시작의 압긍마을에 도착했습니다!" to player for 1 second
+
+command /수표 <number>:
+    trigger:
+        if arg-1 is a number:
+            if player's balance >= arg-1:
+                execute console command "/economy take %player% %arg-1%"
+                give player a name tag named "&e수표 &7- &6%arg-1%&a 원" with lore "&7이 수표를 우클릭하면 돈을 획득할 수 있습니다."
+                send "&a%arg-1% 원의 수표가 생성되었습니다." to player
+            else:
+                send "&c잔액이 부족합니다." to player
+        else:
+            send "&c올바른 금액을 입력하세요." to player
+
+on right click with name tag:
+    if name of player's tool contains "§" and "수표":
+        set {_nameWithoutColor} to uncolored name of player's tool
+        replace all "수표 - " with "" in {_nameWithoutColor}
+        replace all " 원" with "" in {_nameWithoutColor}
+        set {_amount} to {_nameWithoutColor} parsed as number
+        execute console command "/economy give %player% %{_amount}%"
+        remove 1 of player's tool from player's inventory
+        send "&a%{_amount}% 원을 획득했습니다!" to player
+
+
+

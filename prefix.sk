@@ -1,0 +1,128 @@
+variables:
+    {playerTitle::%player%} = ""
+    {korName::%player%} = ""
+
+options:
+    p : &d&l[&fTitle&d&l]&f
+
+
+on join:
+    wait 1 tick  # 플레이어의 데이터가 로드될 때까지 기다립니다.
+    set {_title} to {playerTitle::%player%}
+    set {_kor} to {korName::%player%}
+    set {_displayName} to "%{_title}%&r %{_kor}%&r"
+    set {_tabName} to "%{_title}%&r %{_kor}%&r %player%"
+    #set {_displayName} to player's name
+    set display name of player to coloured {_displayName}
+    set tablist name of player to coloured {_tabName}
+    set {cooldown::%player%} to now
+    send title "&a%{korName::%player%}% 님 환영합니다!" with subtitle "" to player for 3 second
+
+on chat:
+    set message format to "%{playerTitle::%player%}%&r <%{korName::%player%}%&r> %message%"
+
+command /변장 <text>:
+    permission: op
+    trigger:
+        set {_korNameE} to arg-1
+        set {korName::%player%} to coloured {_korNameE}
+        set display name of player to coloured {_korNameE}
+        set tablist name of player to coloured {_korNameE}
+        set {playerTitle::%player%} to ""
+
+
+command /톡 <text> <text>:
+    trigger:
+        set {_korName} to arg-1
+        set {_message} to arg-2
+        set {_found} to false
+        
+        loop all players:
+            if {korName::%loop-player%} contains {_korName}:
+                send "&a[귓속말] &f%{korName::%player%}%&r: %{_message}%" to loop-player
+                send "&a[귓속말] &f나: %{_message}%" to player
+                set {_found} to true
+                stop loop
+
+        if {_found} is false:
+            send "플레이어 %{_korName}% 를 찾을 수 없습니다." to player
+
+
+command /giveitem <item> <text> <text>:
+    permission: op
+    trigger:
+        set {_item} to arg-1
+        set {_name} to coloured arg-2
+        set {_lore} to coloured arg-3
+
+        give player {_item} named "%{_name}%" with lore "%{_lore}%."
+        send "&a%{_item}%이(가) 이름이 %{_name}%로, 설명이 %{_lore}%로 설정되어 지급되었습니다." to player
+
+command /공지 [<text>]:
+    permission: op
+    trigger:
+        set {_txt} to coloured arg 1
+        broadcastMessage({_txt})
+
+command /닉네임 <player> <text>:
+    permission: op
+    trigger:
+        set {_target} to arg-1
+        set {_newNick} to arg-2
+
+        if {_target} is not online:
+            send "플레이어 %arg-1% 가 온라인이 아닙니다." to player
+            stop
+
+        set {korName::%{_target}%} to coloured {_newNick}
+        wait 1 tick  # 플레이어의 데이터가 로드될 때까지 기다립니다.
+        set {_title} to {playerTitle::%{_target}%}
+        set {_kor} to {korName::%{_target}%}
+        set {_displayName} to "%{_title}%&r %{_kor}%&r"
+        set {_tabName} to "%{_title}%&r %{_kor}%&r %{_target}%"
+
+        set display name of {_target} to coloured {_displayName}
+        set tablist name of {_target} to coloured {_tabName}
+        send "닉네임이 &c%{_kor}%&r 로 변경되었습니다!" to {_target}
+        send "플레이어 %arg-1% 의 닉네임이 &c%{_kor}%&r 로 변경되었습니다!" to player
+
+
+
+#칭호 책 생성
+command /titlebook [<text>]:
+    permission: op
+    trigger:
+        if arg 1 isn't set:
+            send "{@p} Please specify a title." to player
+            stop
+        set {_title} to coloured arg 1
+        give player a book named "{@p} %{_title}%" with lore "&fRight-click to obtain this title."
+        send "{@p} Title book with name %{_title}% &fhas been given to you."
+
+#칭호 책 사용
+on right click with book:
+    if player's tool's name contains "{@p}":
+        set {_title} to name of player's tool
+        replace "{@p}" in {_title} with ""
+        set {playerTitle::%player%} to coloured {_title}
+        set {_kor} to {korName::%player%}
+        set {_displayName} to "%{_title}%&r %{_kor}%&r"
+        set {_tabName} to "%{_title}%&r %{_kor}%&r %player%"
+        set display name of player to coloured {_displayName}
+        set tablist name of player to coloured {_tabName}
+        broadcastMessage("&c&l%{korName::%player%}%&r 님이 칭호를 %{_title}%&r 으로 변경하셨습니다.")
+        remove 1 of player's tool from player's inventory
+
+
+function broadcastMessage(middleMessage: text):
+    loop all players:
+        play sound "ui.toast.challenge_complete" to loop-player
+
+    broadcast " "
+    broadcast "&d&m----------------------------------------"
+    broadcast " "
+    broadcast "%{_middleMessage}%"
+    broadcast " "
+    broadcast "&d&m----------------------------------------"
+    broadcast " "
+

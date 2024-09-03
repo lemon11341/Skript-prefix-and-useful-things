@@ -1,0 +1,45 @@
+variables:
+    {itemList::*} = none
+    {chestLocations::%player%} = none
+    {expPoints::%player%} = 0
+
+command /아이템추가:
+    trigger:
+        if player's tool is set:
+            add player's tool to {itemList::*}
+            send "&a아이템이 리스트에 추가되었습니다." to player
+        else:
+            send "&c들고 있는 아이템이 없습니다." to player
+
+command /아이템지급:
+    permission: op
+    trigger:
+        # 임시 상자 생성 (6줄짜리, 총 54칸)
+        set {_inventory} to a new chest inventory with 6 rows named "운영자의 창고"
+        
+        # 상자에 아이템 추가
+        
+        add book named "&d&l[&fTitle&d&l]&f" with lore "&fRight-click to obtain this title." to {_inventory}
+        add book named "&d&l[&fTitle&d&l]&f &d&l[운영자]" with lore "&fRight-click to obtain this title." to {_inventory}
+
+        add stick named "&d&l[운영자의 죽음의 빠따]&r" with lore "운영자 전용 죽음의 빠따" to {_inventory}
+        loop all items in {_inventory}:
+            if name of loop-item contains "§" and "운영자의":
+                enchant loop-item with unbreaking 10
+                enchant loop-item with mending
+                enchant loop-item with sharpness 100
+                enchant loop-item with protection 100
+                enchant loop-item with breach 4
+        add stick named "&d&l[운영자의 아프지만 증거는 안남는 빠따]&r" with lore "운영자 전용 죽음의 빠따" to {_inventory}
+        loop all items in {_inventory}:
+            if name of loop-item contains "§" and "운영자의 아프":
+                enchant loop-item with unbreaking 10
+                enchant loop-item with mending
+                enchant loop-item with knockback 10
+                enchant loop-item with protection 100
+
+        loop {itemList::*}:
+            add loop-value to {_inventory}
+        # 플레이어에게 상자 보여주기
+        open {_inventory} to player
+
