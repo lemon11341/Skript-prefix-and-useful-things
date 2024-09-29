@@ -1,6 +1,7 @@
-# Skript-prefix-and-useful-things
-prefix and useful systems by Skript (effects using skript-particle)
+# 스크립트 플러그인 칭호북, 그리고 몇가지
+Skript에서 사용 가능한 창 및 유용한 시스템들 (skript-particle 애드온 사용)
 
-prefix, whisper chat system
-item inventory for op
-teleport scroll to coordinate
+칭호북, 귓속말 채팅 시스템
+운영자(OP)를 위한 아이템 인벤토리
+좌표로 순간이동하는 스크롤
+그 외 몇개
